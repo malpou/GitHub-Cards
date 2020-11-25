@@ -2,14 +2,18 @@ import React from "react";
 import axios from "axios";
 
 class Form extends React.Component {
-  state = { userName: "" };
+  state = {
+    userName: "",
+    error: false
+  };
   handleSubmit = async event => {
     event.preventDefault();
-    const res = await axios.get(
+    axios.get(
       `https://api.github.com/users/${this.state.userName}`
-    );
-    this.props.onSubmit(res.data);
-    this.setState({ userName: "" });
+    ).then(res => {
+      this.props.onSubmit(res.data);
+      this.setState({ userName: "", error: false });
+    }).catch(() => this.setState({error: true}));
   };
   render() {
     return (
@@ -19,6 +23,7 @@ class Form extends React.Component {
           value={this.state.userName}
           onChange={event => this.setState({ userName: event.target.value })}
           placeholder="GitHub username"
+          style={{ 'color': this.state.error ? 'red' : 'black'}}
           required
         />
         <button>Add card</button>
